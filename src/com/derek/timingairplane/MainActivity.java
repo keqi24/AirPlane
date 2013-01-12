@@ -31,11 +31,9 @@ public class MainActivity extends Activity {
 	public static final String ID = "id";  
 	public static final String TIME = "alarm_time";  
 	
-	
 	//不同的broadcast 的ID
 	public static final int BROADCAST_AIRPLANE_ID = 1;
 	public static final int BROADCAST_CANCEL_ID = 2;
-	
 	
 	
 	//component
@@ -45,13 +43,33 @@ public class MainActivity extends Activity {
 	ToggleButton current_toggle_airplane;
 	ToggleButton current_toggle_cancel;
 	
+	/****************************************lift circle************************************************/
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
 		initComponent();
+		
 	}
+	
+	
+	
+	
+
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		setToggleStatus();
+		super.onStart();
+	}
+
+
+
+
+
+	/****************************************componet************************************************/
 	
 	//call in onCreate() to init all the component
 	private void initComponent() {
@@ -63,6 +81,21 @@ public class MainActivity extends Activity {
 		current_toggle_cancel = (ToggleButton) findViewById(R.id.toggle_current_cancel);
 	}
 	
+	//check the exist pendingIntent to set the toggle status
+	private void setToggleStatus() {
+		  Intent intent = new Intent(ALARM_INTENT);  
+//        intent.setClass(this, AlarmReceiver.class);  
+//        intent.setData(Uri.parse("content://calendar/calendar_alerts/1"));  
+        intent.putExtra(ID, BROADCAST_AIRPLANE_ID); 
+        PendingIntent senderAirplane = PendingIntent.getBroadcast(this, BROADCAST_AIRPLANE_ID, intent, PendingIntent.FLAG_NO_CREATE);  
+		PendingIntent senderCancel = PendingIntent.getBroadcast(this, BROADCAST_CANCEL_ID, intent, PendingIntent.FLAG_NO_CREATE);  
+	       
+        current_toggle_airplane.setChecked(senderAirplane!=null?true:false);
+        current_toggle_cancel.setChecked(senderCancel!=null?true:false);
+	}
+	
+	
+	/****************************************set button************************************************/
 	
 	/*
 	 * set button onClick
@@ -93,9 +126,8 @@ public class MainActivity extends Activity {
 	}
 	
 	
-	/*
-	 * toggle button 
-	 */
+	/****************************************toggle button************************************************/
+	
 	//airPalne toggle is clicked
 	public void onAirPlaneToggle(View view) {
 		boolean on = ((ToggleButton)view).isChecked();
@@ -122,6 +154,9 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+	
+	/****************************************alarm************************************************/
+	
 	public void setAlarm(int id, String intetn_id, TextView tv) {
 		AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);  
 		Intent intent = new Intent(intetn_id);
@@ -131,17 +166,16 @@ public class MainActivity extends Activity {
         
         intent.putExtra(ID, id);  
         long atTimeInMillis = getTimeFormTextView(tv);  
-//        long atTimeInMillis = Calendar.getInstance().getTimeInMillis() + 30000;
+//        long atTimeInMillis = Calendar.getInstance().getTimeInMillis() + 120000;
         intent.putExtra(TIME, atTimeInMillis);  
         
         
-        PendingIntent sender = PendingIntent.getBroadcast(this, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.set(AlarmManager.RTC_WAKEUP, atTimeInMillis, sender);
+        PendingIntent sender = PendingIntent.getBroadcast(this, id, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+//        am.set(AlarmManager.RTC_WAKEUP, atTimeInMillis, sender);
+        //every day will repeat
+        am.setRepeating(AlarmManager.RTC, atTimeInMillis, AlarmManager.INTERVAL_DAY, sender);
         Log.i(FLAG, "setAlarm");
 	}
-	
-	
-	
 	
 	public void cancelAlarm(int id, String intetn_id) {
 		AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);  
@@ -153,10 +187,15 @@ public class MainActivity extends Activity {
         if (sender != null){  
             Log.i(FLAG,"cancel alarm");  
             am.cancel(sender);  
+            sender.cancel();
         }else{  
             Log.i(FLAG,"sender == null");  
         }  
+        
 	}
+	
+	
+	/****************************************common function************************************************/
 	
 	//get time content hour and minute 
 	protected long getTimeFormTextView(TextView tv) {
@@ -189,6 +228,8 @@ public class MainActivity extends Activity {
 		return 0;
 	}
 
+	
+	/****************************************other function************************************************/
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
