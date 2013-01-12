@@ -1,13 +1,17 @@
-package com.derek.timingairplane;
+package com.derek.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-public class AirPlaneAlarmReceiver extends BroadcastReceiver{
+import com.derek.timingairplane.MainActivity;
+import com.derek.utility.AirModeController;
+/*
+ * unused controlled by the AlarmReceiver
+ */
+public class CancelAlarmReceiver extends BroadcastReceiver{
 
 	static final String FLAG = "air_plane";
 	@Override
@@ -18,7 +22,7 @@ public class AirPlaneAlarmReceiver extends BroadcastReceiver{
         Log.i(FLAG,"received action = "+action+", id = "+id+ ", alarmtime = "+alarmtime);  
         Toast.makeText(context, "received action = "+action+", id = "+id, Toast.LENGTH_SHORT).show();
        
-        AirModeController.setOnAir(context);
+        AirModeController.setOffAir(context);
         
 	}
 

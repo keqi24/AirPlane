@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
 
 	
 	//log flag
-	static final String FLAG = "air_plane";
+	public static final String FLAG = "air_plane";
 	
 	//broadcast intent ID
 	static final String AIRPLANE_ALARM_INTENT = "com.derek.alarm.airplane";
@@ -28,13 +28,13 @@ public class MainActivity extends Activity {
 	static final String ALARM_INTENT = "com.derek.alarm";
 	
 	//put extra content
-	static final String ID = "id";  
-    static final String TIME = "alarm_time";  
+	public static final String ID = "id";  
+	public static final String TIME = "alarm_time";  
 	
 	
 	//不同的broadcast 的ID
-	static final int BROADCAST_AIRPLANE_ID = 1;
-	static final int BROADCAST_CANCEL_ID = 2;
+	public static final int BROADCAST_AIRPLANE_ID = 1;
+	public static final int BROADCAST_CANCEL_ID = 2;
 	
 	
 	
@@ -172,6 +172,9 @@ public class MainActivity extends Activity {
 			Calendar cal = Calendar.getInstance();
 			cal.set(Calendar.HOUR_OF_DAY, hour);
 			cal.set(Calendar.MINUTE, minute);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			
 			
 			long result = cal.getTimeInMillis();
 			

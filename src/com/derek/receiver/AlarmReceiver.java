@@ -1,11 +1,11 @@
-package com.derek.timingairplane;
+package com.derek.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.Settings;
-import android.util.Log;
-import android.widget.Toast;
+
+import com.derek.timingairplane.MainActivity;
+import com.derek.utility.AirModeController;
 
 public class AlarmReceiver extends BroadcastReceiver{
 

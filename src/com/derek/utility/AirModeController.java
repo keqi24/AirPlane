@@ -1,4 +1,4 @@
-package com.derek.timingairplane;
+package com.derek.utility;
 
 import android.content.Context;
 import android.content.Intent;
