@@ -1,0 +1,117 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity" >
+
+    <TextView
+        android:id="@+id/text_current"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="28dp"
+        android:text="@string/text_current"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/text_current_airplane"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/text_current"
+        android:layout_below="@+id/text_current"
+        android:layout_marginTop="21dp"
+        android:text="@string/text_airplane"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+     <TextView
+        android:id="@+id/time_current_airplane"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/text_current_cancel"
+        android:layout_toRightOf="@+id/text_current"
+        android:text="@string/time_default"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/text_current_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/text_current_airplane"
+        android:layout_below="@+id/text_current_airplane"
+        android:layout_marginTop="18dp"
+        android:text="@string/text_cancel"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+    <TextView
+        android:id="@+id/time_current_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/text_current_cancel"
+        android:layout_alignBottom="@+id/text_current_cancel"
+        android:layout_toRightOf="@+id/text_current"
+        android:text="@string/time_default"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ToggleButton
+        android:id="@+id/toggle_current_airplane"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/time_current_airplane"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="38dp"
+        android:textOff="@string/button_off"
+        android:textOn="@string/button_on" 
+        android:onClick="onAirPlaneToggle"/>
+
+    <ToggleButton
+        android:id="@+id/toggle_current_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/time_current_cancel"
+        android:layout_alignBottom="@+id/time_current_cancel"
+        android:layout_alignLeft="@+id/toggle_current_airplane"
+        android:textOff="@string/button_off"
+        android:textOn="@string/button_on" 
+        android:onClick="onCancelToggle"/>
+
+    <TextView
+        android:id="@+id/text_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toggle_current_cancel"
+        android:layout_marginTop="44dp"
+        android:layout_toLeftOf="@+id/time_current_cancel"
+        android:text="@string/text_reset"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TimePicker
+        android:id="@+id/timepicker_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_reset"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp" />
+
+    <Button
+        android:id="@+id/button_reset_airplane"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/time_current_cancel"
+        android:layout_below="@+id/timepicker_reset"
+        android:layout_marginTop="31dp"
+        android:text="@string/button_airplane"
+        android:onClick="onSetAirplaneClick" />
+
+    <Button
+        android:id="@+id/button_reset_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/button_reset_airplane"
+        android:layout_alignRight="@+id/timepicker_reset"
+        android:text="@string/button_cancel"
+        android:onClick="onSetCancelClick" />
+    
+</RelativeLayout>
