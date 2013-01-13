@@ -1,5 +1,6 @@
 package com.derek.timingairplane;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import android.app.Activity;
@@ -13,7 +14,10 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import com.derek.data.PreferenceStorage;
 
 public class MainActivity extends Activity {
 
@@ -22,9 +26,6 @@ public class MainActivity extends Activity {
 	public static final String FLAG = "air_plane";
 	
 	//broadcast intent ID
-	static final String AIRPLANE_ALARM_INTENT = "com.derek.alarm.airplane";
-	static final String CANCEL_ALARM_INTENT = "com.derek.alarm.cancel";
-	//test broadcast intent ID
 	static final String ALARM_INTENT = "com.derek.alarm";
 	
 	//put extra content
@@ -53,20 +54,21 @@ public class MainActivity extends Activity {
 		initComponent();
 		
 	}
-	
-	
-	
-	
 
 	@Override
 	protected void onStart() {
 		// TODO Auto-generated method stub
-		setToggleStatus();
+		initCurrentTime();
+		initToggleStatus();
 		super.onStart();
 	}
 
-
-
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.activity_main, menu);
+		return true;
+	}
 
 
 	/****************************************componet************************************************/
@@ -82,7 +84,7 @@ public class MainActivity extends Activity {
 	}
 	
 	//check the exist pendingIntent to set the toggle status
-	private void setToggleStatus() {
+	private void initToggleStatus() {
 		  Intent intent = new Intent(ALARM_INTENT);  
 //        intent.setClass(this, AlarmReceiver.class);  
 //        intent.setData(Uri.parse("content://calendar/calendar_alerts/1"));  
@@ -92,6 +94,13 @@ public class MainActivity extends Activity {
 	       
         current_toggle_airplane.setChecked(senderAirplane!=null?true:false);
         current_toggle_cancel.setChecked(senderCancel!=null?true:false);
+	}
+	
+	//set the airplane time and cancel time stored
+	private void initCurrentTime() {
+		PreferenceStorage ps = PreferenceStorage.shareInstance();
+		current_airplane_time.setText(ps.getAirPlaneTime(this));
+		current_cancel_time.setText(ps.getCancelTime(this));
 	}
 	
 	
@@ -104,25 +113,30 @@ public class MainActivity extends Activity {
 	 * 2. reset alarm broadcast
 	 * */
 	public void onSetAirplaneClick(View view) {
-		String str = tp.getCurrentHour() + ":" + tp.getCurrentMinute();
-		current_airplane_time.setText(str);
+		current_airplane_time.setText(getTimePickerTime());
 		
-		/*if(!(current_toggle_airplane.isChecked())) {
+		if(!(current_toggle_airplane.isChecked())) {
 			current_toggle_airplane.setChecked(true);
 		}
-		setAlarm(BROADCAST_AIRPLANE_ID, AIRPLANE_ALARM_INTENT, current_airplane_time);*/
-	
-		
+		setAlarm(BROADCAST_AIRPLANE_ID, ALARM_INTENT, current_airplane_time);
 	}
 	
 	public void onSetCancelClick(View view) {
-		String str = tp.getCurrentHour() + ":" + tp.getCurrentMinute();
-		current_cancel_time.setText(str);
+		current_cancel_time.setText(getTimePickerTime());
 		
-		/*if(!(current_toggle_cancel.isChecked())) {
+		if(!(current_toggle_cancel.isChecked())) {
 			current_toggle_cancel.setChecked(true);
 		}
-		setAlarm(BROADCAST_CANCEL_ID, CANCEL_ALARM_INTENT, current_cancel_time);*/
+		setAlarm(BROADCAST_CANCEL_ID, ALARM_INTENT, current_cancel_time);
+	}
+	
+	public String getTimePickerTime() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(String.format("%02d", tp.getCurrentHour()));
+		sb.append(":");
+		sb.append(String.format("%02d", tp.getCurrentMinute()));
+		Log.i(FLAG, sb.toString());
+		return sb.toString();
 	}
 	
 	
@@ -132,12 +146,9 @@ public class MainActivity extends Activity {
 	public void onAirPlaneToggle(View view) {
 		boolean on = ((ToggleButton)view).isChecked();
 		if(on) {
-			//setAlarm(BROADCAST_AIRPLANE_ID, AIRPLANE_ALARM_INTENT, current_airplane_time);
-			//onAirPlane();
 			setAlarm(BROADCAST_AIRPLANE_ID, ALARM_INTENT, current_airplane_time);
 		}
 		else {
-			//cancelAlarm(BROADCAST_AIRPLANE_ID, AIRPLANE_ALARM_INTENT);
 			cancelAlarm(BROADCAST_AIRPLANE_ID, ALARM_INTENT);
 		}
 	}
@@ -145,11 +156,9 @@ public class MainActivity extends Activity {
 	public void onCancelToggle(View view) {
 		boolean on = ((ToggleButton)view).isChecked();
 		if(on) {
-			//setAlarm(BROADCAST_CANCEL_ID, CANCEL_ALARM_INTENT, current_cancel_time);
 			setAlarm(BROADCAST_CANCEL_ID, ALARM_INTENT, current_cancel_time);
 		}
 		else {
-			//cancelAlarm(BROADCAST_CANCEL_ID, CANCEL_ALARM_INTENT);
 			cancelAlarm(BROADCAST_CANCEL_ID, ALARM_INTENT);
 		}
 	}
@@ -161,20 +170,19 @@ public class MainActivity extends Activity {
 		AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);  
 		Intent intent = new Intent(intetn_id);
 //		intent.setData(Uri.parse("content://calendar/calendar_alerts/1"));  
-//        intent.setClass(this, AlarmReceiver.class);  
-        
+//      intent.setClass(this, AlarmReceiver.class);  
         
         intent.putExtra(ID, id);  
         long atTimeInMillis = getTimeFormTextView(tv);  
-//        long atTimeInMillis = Calendar.getInstance().getTimeInMillis() + 120000;
         intent.putExtra(TIME, atTimeInMillis);  
         
-        
         PendingIntent sender = PendingIntent.getBroadcast(this, id, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-//        am.set(AlarmManager.RTC_WAKEUP, atTimeInMillis, sender);
         //every day will repeat
         am.setRepeating(AlarmManager.RTC, atTimeInMillis, AlarmManager.INTERVAL_DAY, sender);
         Log.i(FLAG, "setAlarm");
+        
+        //set the alarm and store the time
+        storeCurrentTime(id);
 	}
 	
 	public void cancelAlarm(int id, String intetn_id) {
@@ -215,11 +223,11 @@ public class MainActivity extends Activity {
 			cal.set(Calendar.MILLISECOND, 0);
 			
 			
-			long result = cal.getTimeInMillis();
-			
-			if(result < Calendar.getInstance().getTimeInMillis()) {
+			if(cal.compareTo(Calendar.getInstance()) < 0) {
 				cal.add(Calendar.DATE, 1);
 			} 
+			
+			showSeprateTime(cal);
 			
 			return cal.getTimeInMillis();
 			
@@ -227,14 +235,44 @@ public class MainActivity extends Activity {
 		Log.e(FLAG, "get The time from textview is error :" + str);
 		return 0;
 	}
-
+	
+	//storage the current time
+	protected void storeCurrentTime(int id) {
+		switch(id) {
+			case BROADCAST_AIRPLANE_ID:
+				PreferenceStorage.shareInstance().setAirPlaneTime(this, current_airplane_time.getText().toString());
+				break;
+			case BROADCAST_CANCEL_ID:
+				PreferenceStorage.shareInstance().setCancelTime(this, current_cancel_time.getText().toString());
+				break;
+			default:
+				break;
+		}
+	}
 	
 	/****************************************other function************************************************/
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_main, menu);
-		return true;
+	protected void showSeprateTime(Calendar cal) {
+		Calendar cur = Calendar.getInstance();
+		StringBuilder sb = new StringBuilder(getResources().getString(R.string.text_time_delay));
+		
+		long diff = cal.getTimeInMillis() -  cur.getTimeInMillis();
+		if(diff > 0) {
+			long s = diff/1000;
+			long day = s / (24*60*60);
+			s = s - day*24*60*60;
+			long hour = s / (60*60);
+			s = s - hour*60*60;
+			long minute = s/60;
+			sb.append(day);
+			sb.append(getResources().getString(R.string.text_day));
+			sb.append(hour);
+			sb.append(getResources().getString(R.string.text_hour));
+			sb.append(minute);
+			sb.append(getResources().getString(R.string.text_minute));
+			Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
+		} 
+		
+		
 	}
+	
 }

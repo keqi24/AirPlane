@@ -44,7 +44,11 @@ public final class R {
         public static final int text_airplane=0x7f040004;
         public static final int text_cancel=0x7f040005;
         public static final int text_current=0x7f040003;
+        public static final int text_day=0x7f04000d;
+        public static final int text_hour=0x7f04000e;
+        public static final int text_minute=0x7f04000f;
         public static final int text_reset=0x7f040006;
+        public static final int text_time_delay=0x7f04000c;
         public static final int time_default=0x7f04000b;
     }
     public static final class style {
